@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="An interactive, easy-to-understand guide to the 30 most important system design patterns, with real-world analogies and examples." />
+<title>The 30 System Design Patterns — Interactive Guide</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-soft: #161b22;
+    --bg-card: #1c2230;
+    --bg-card-hover: #232b3b;
+    --border: #2a3344;
+    --text: #e6edf3;
+    --text-soft: #9aa7b8;
+    --text-dim: #6b778c;
+    --accent: #4f9cf9;
+    --accent-soft: rgba(79, 156, 249, 0.15);
+    --green: #3fb950;
+    --green-soft: rgba(63, 185, 80, 0.13);
+    --orange: #f0883e;
+    --orange-soft: rgba(240, 136, 62, 0.13);
+    --data: #f5b301;
+    --data-soft: rgba(245, 179, 1, 0.14);
+    --data-ring: rgba(245, 179, 1, 0.4);
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    --radius: 14px;
+  }
+
+  [data-theme="light"] {
+    --bg: #f4f6fa;
+    --bg-soft: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f7f9fc;
+    --border: #e1e7ef;
+    --text: #1a2233;
+    --text-soft: #4a5568;
+    --text-dim: #8a96a8;
+    --accent: #2563eb;
+    --accent-soft: rgba(37, 99, 235, 0.1);
+    --green: #15803d;
+    --green-soft: rgba(21, 128, 61, 0.1);
+    --orange: #c2410c;
+    --orange-soft: rgba(194, 65, 12, 0.1);
+    --data: #b45309;
+    --data-soft: rgba(180, 83, 9, 0.1);
+    --data-ring: rgba(180, 83, 9, 0.32);
+    --shadow: 0 8px 30px rgba(40, 60, 90, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    background: linear-gradient(135deg, #4f9cf9 0%, #7c5cff 55%, #b14df9 100%);
+    color: #fff;
+    padding: 48px 20px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 40%),
+                radial-gradient(circle at 80% 0%, rgba(255,255,255,0.12), transparent 35%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+  header p {
+    margin-top: 12px;
+    font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+    opacity: 0.92;
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+  .header-badge {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 5px 14px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+  }
+
+  /* ---------- Controls (sticky) ---------- */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    backdrop-filter: blur(8px);
+  }
+  .controls-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .search-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .icon-btn {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .icon-btn:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
+  .nav-toggle { font-size: 1.35rem; line-height: 1; }
+  .search-box {
+    flex: 1;
+    position: relative;
+  }
+  .search-box svg {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    fill: var(--text-dim);
+  }
+  .search-box input {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .search-box input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pill {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-soft);
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+  }
+  .pill:hover { background: var(--bg-card-hover); color: var(--text); }
+  .pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .pill .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .pill.data-pill {
+    border-color: var(--data-ring);
+    color: var(--data);
+    background: var(--data-soft);
+  }
+  .pill.data-pill.active {
+    background: var(--data);
+    border-color: var(--data);
+    color: #1a1400;
+  }
+
+  /* ---------- Navigation drawer ---------- */
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(3px);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 320px;
+    max-width: 86vw;
+    background: var(--bg-soft);
+    border-right: 1px solid var(--border);
+    z-index: 95;
+    transform: translateX(-100%);
+    transition: transform 0.26s cubic-bezier(.22,.61,.36,1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .drawer-head h2 { font-size: 1.05rem; font-weight: 800; }
+  .drawer-head p { font-size: 0.74rem; color: var(--text-dim); margin-top: 2px; }
+  .drawer-body { overflow-y: auto; padding: 10px 12px 26px; flex: 1; }
+  .toc-quick {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    padding: 4px 6px 12px;
+    border-bottom: 1px dashed var(--border);
+    margin-bottom: 10px;
+  }
+  .toc-group { margin-top: 12px; }
+  .toc-cat {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toc-cat:hover { background: var(--bg-card-hover); }
+  .toc-cat .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .toc-cat .c-count { margin-left: auto; font-size: 0.7rem; color: var(--text-dim); font-weight: 700; }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    font-size: 0.88rem;
+    padding: 7px 10px 7px 24px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .toc-item:hover { background: var(--bg-card-hover); color: var(--text); }
+  .toc-item .ti-num { font-size: 0.7rem; color: var(--text-dim); width: 18px; flex-shrink: 0; }
+  .toc-item .ti-icon { font-size: 0.95rem; }
+  .toc-item.is-data { color: var(--data); }
+  .toc-item .ti-star { margin-left: auto; font-size: 0.72rem; }
+
+  /* ---------- Main grid ---------- */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 26px 20px 60px;
+  }
+  .result-count {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+  }
+  .data-callout {
+    background: var(--data-soft);
+    border: 1px solid var(--data-ring);
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: var(--text);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .data-callout .dc-star { font-size: 1.1rem; line-height: 1.4; }
+  .data-callout b { color: var(--data); }
+
+  .cat-section { margin-bottom: 30px; scroll-margin-top: 150px; }
+  .cat-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-heading .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .cat-heading h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.2px; }
+  .cat-heading .ch-count {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-weight: 700;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 9px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--cat-color, var(--accent));
+    opacity: 0.85;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--cat-color, var(--accent));
+  }
+  .card.data {
+    box-shadow: inset 0 0 0 1px var(--data-ring);
+  }
+  .card.data::before {
+    background: linear-gradient(90deg, var(--data), var(--cat-color, var(--accent)));
+    height: 4px;
+  }
+  .card.data:hover {
+    border-color: var(--data);
+    box-shadow: inset 0 0 0 1px var(--data-ring), 0 8px 30px rgba(245,179,1,0.18);
+  }
+  .card-cat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .card-cat {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--cat-color, var(--accent));
+  }
+  .data-badge {
+    margin-left: auto;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--data);
+    background: var(--data-soft);
+    border: 1px solid var(--data-ring);
+    border-radius: 999px;
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 10px;
+  }
+  .card-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-size: 1.06rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+  .card-num {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+  }
+  .card-line {
+    display: flex;
+    gap: 8px;
+    font-size: 0.85rem;
+    margin-top: auto;
+    padding-top: 10px;
+  }
+  .tag {
+    flex: 1;
+    border-radius: 8px;
+    padding: 7px 9px;
+    line-height: 1.35;
+  }
+  .tag-when {
+    background: var(--green-soft);
+    color: var(--green);
+  }
+  .tag-trade {
+    background: var(--orange-soft);
+    color: var(--orange);
+  }
+  .tag-label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.8;
+    margin-bottom: 1px;
+  }
+  .tap-hint {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 11px;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty span { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    transform: translateY(18px) scale(0.98);
+    transition: transform 0.22s ease;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+  .modal-head {
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    z-index: 2;
+  }
+  .modal-cat {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--cat-color, var(--accent));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-data-badge {
+    font-size: 0.64rem;
+    font-weight: 800;
+    color: var(--data);
+    background: var(--data-soft);
+    border: 1px solid var(--data-ring);
+    border-radius: 999px;
+    padding: 2px 9px;
+    letter-spacing: 0.4px;
+  }
+  .modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .modal-title-row .micon { font-size: 2rem; }
+  .modal-title-row h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text-soft);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.18s, color 0.18s;
+  }
+  .modal-close:hover { background: var(--bg-card-hover); color: var(--text); }
+  .modal-body { padding: 8px 24px 26px; }
+  .section { margin-top: 20px; }
+  .section h3 {
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-dim);
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .section p { color: var(--text-soft); font-size: 0.96rem; }
+  .section p strong { color: var(--text); }
+  .callout {
+    border-radius: 10px;
+    padding: 13px 15px;
+    font-size: 0.95rem;
+  }
+  .callout.when { background: var(--green-soft); }
+  .callout.when p { color: var(--text-soft); }
+  .callout.when strong { color: var(--green); }
+  .callout.trade { background: var(--orange-soft); }
+  .callout.trade p { color: var(--text-soft); }
+  .callout.trade strong { color: var(--orange); }
+  .callout.example {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+  }
+  .callout.example p { color: var(--text); }
+
+  .modal-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 26px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .nav-btn:hover:not(:disabled) { background: var(--bg-card-hover); }
+  .nav-btn:disabled { opacity: 0.4; cursor: default; }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* back-to-top */
+  .to-top {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--accent);
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.2s;
+  }
+  .to-top.show { opacity: 1; pointer-events: auto; }
+  .to-top:hover { transform: translateY(-3px); }
+
+  /* highlight search match */
+  mark {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 36px 18px 30px; }
+    main { padding: 20px 14px 50px; }
+    .grid { grid-template-columns: 1fr; gap: 14px; }
+    .modal-head { padding: 18px 18px 14px; }
+    .modal-body { padding: 6px 18px 22px; }
+    .modal { border-radius: 16px 16px 0 0; max-height: 92vh; align-self: flex-end; }
+    .modal-overlay { padding: 0; align-items: flex-end; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-badge">SYSTEM DESIGN · INTERVIEW PREP</span>
+  <h1>System Design Patterns</h1>
+  <p>40 patterns across 7 categories. Each card gives a plain-English explanation, an analogy, a real-world example, and interview-ready notes on <em>when to reach for it</em> and the <em>trade-offs</em> you accept. ⭐ marks the concepts most important for data platforms.</p>
+</header>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-row">
+      <button class="icon-btn nav-toggle" id="navToggle" title="Open navigation" aria-label="Open navigation">☰</button>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.49 4.49 0 0 1 9.5 14z"/></svg>
+        <input type="text" id="search" placeholder="Search patterns, e.g. 'cache', 'kafka', 'failure'..." autocomplete="off" />
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">🌙</button>
+    </div>
+    <div class="filters" id="filters"></div>
+  </div>
+</div>
+
+<!-- Navigation drawer -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<nav class="drawer" id="drawer" aria-label="Pattern navigation">
+  <div class="drawer-head">
+    <div>
+      <h2>Navigate</h2>
+      <p>Jump straight to any concept</p>
+    </div>
+    <button class="icon-btn" id="drawerClose" aria-label="Close navigation">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</nav>
+
+<main>
+  <div class="data-callout" id="dataCallout">
+    <span class="dc-star">⭐</span>
+    <span>Patterns marked <b>⭐ Data</b> are core to <b>data-intensive systems</b> — storage, replication, partitioning, consistency, and processing. The <b>Data Platform &amp; Pipelines</b> section adds data-engineering essentials (CDC, WAL, lakehouse, batch/stream). Tap <b>“⭐ Data Apps”</b> to focus on just these.</span>
+  </div>
+  <div class="result-count" id="count"></div>
+  <div id="sections"></div>
+  <div class="empty" id="empty" style="display:none">
+    <span>🔍</span>
+    No patterns match your search. Try a different word.
+  </div>
+</main>
+
+<button class="to-top" id="toTop" title="Back to top" aria-label="Back to top">↑</button>
+
+<div class="modal-overlay" id="overlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" id="closeBtn" aria-label="Close">✕</button>
+    <div class="modal-head">
+      <div class="modal-cat" id="mCat"></div>
+      <div class="modal-title-row">
+        <span class="micon" id="mIcon"></span>
+        <h2 id="mTitle"></h2>
+      </div>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<footer>
+  Built as a personal interview-prep companion · works offline. <br />
+  Use <strong>← →</strong> arrow keys to move between patterns, <strong>Esc</strong> to close.
+</footer>
+
+<script>
+// ---------------------------------------------------------------------------
+// DATA: the 30 system design patterns
+// `data: true` marks patterns central to data-intensive applications.
+// ---------------------------------------------------------------------------
+const CATEGORIES = {
+  scaling:  { label: "Scaling & Distribution", color: "#4f9cf9" },
+  caching:  { label: "Caching & Delivery",     color: "#22c55e" },
+  data:     { label: "Data & Consistency",     color: "#a855f7" },
+  events:   { label: "Messaging & Events",     color: "#f59e0b" },
+  resilience:{ label: "Resilience & Reliability", color: "#ef4444" },
+  infra:    { label: "Infrastructure & Coordination", color: "#14b8a6" },
+  dataplatform: { label: "Data Platform & Pipelines", color: "#ec4899" },
+};
+
+const PATTERNS = [
+  {
+    cat: "scaling", icon: "⚖️", name: "Load Balancing",
+    when: "Traffic exceeds one server",
+    whenMore: "When one server's throughput is the ceiling, or you run two or more instances and need requests spread (round-robin, least-connections) with health checks to drain dead nodes. Operates at L4 (TCP) or L7 (HTTP).",
+    trade: "Needs statelessness or session handling",
+    tradeMore: "Servers must be stateless, or you need sticky sessions or a shared session store (Redis). The balancer itself is a single point of failure, so it requires its own redundancy and health checks.",
+    explain: "A load balancer sits in front of several servers and spreads incoming requests across them, so no single server gets overwhelmed and one crash doesn't take everything down.",
+    analogy: "Like the host at a busy restaurant directing each guest to whichever waiter has the fewest tables — nobody gets swamped while others stand idle.",
+    example: "AWS Elastic Load Balancer or NGINX distributing web traffic across a fleet of app servers. When you search Google, a load balancer routes you to one of thousands of machines.",
+  },
+  {
+    cat: "scaling", icon: "📈", name: "Horizontal Scaling",
+    when: "Load keeps growing",
+    whenMore: "When load outgrows the biggest single box (vertical scaling) or is bursty — scale out with stateless, interchangeable nodes behind autoscaling. The default way to grow modern web tiers.",
+    trade: "Coordination complexity",
+    tradeMore: "The distributed-systems tax: shared state, cache coherence, leader election, config drift. Stateless tiers scale cleanly; stateful ones (databases) don't, which is exactly what pushes you toward sharding.",
+    explain: "Instead of buying one ever-bigger machine (vertical scaling), you add more ordinary machines and split the work among them. You scale 'out', not 'up'.",
+    analogy: "When a coffee shop gets busy you don't ask one barista to move faster — you open more registers and add baristas.",
+    example: "Netflix spins up more stateless servers during peak streaming hours; Kubernetes auto-scales pods up and down based on CPU and traffic.",
+  },
+  {
+    cat: "scaling", icon: "🗄️", name: "Database Sharding", data: true,
+    when: "One DB cannot handle writes",
+    whenMore: "When a single primary's write throughput or storage is the bottleneck — replicas don't help because they copy every write. Shard by a high-cardinality key that co-locates related rows.",
+    trade: "Cross-shard queries become hard",
+    tradeMore: "Cross-shard joins and aggregates need scatter-gather; multi-shard transactions need 2PC or sagas. A poor shard key causes hotspots and forces painful resharding — the key choice is hard to change later.",
+    explain: "Splits one huge database into smaller pieces called shards, each holding a slice of the data on its own machine, so writes and storage spread out instead of bottlenecking on one server.",
+    analogy: "A phone book split into A–M and N–Z volumes, so two people can look up names at the same time without fighting over one book.",
+    example: "Instagram shards user data across many PostgreSQL machines; Discord shards billions of messages by the server (guild) they belong to.",
+  },
+  {
+    cat: "scaling", icon: "📑", name: "Read Replicas", data: true,
+    when: "Reads greatly exceed writes",
+    whenMore: "Read-heavy, write-light workloads (high read:write ratio) — offload reads to asynchronous replicas and keep the primary for writes. Does nothing to scale writes; use sharding for that.",
+    trade: "Replication lag",
+    tradeMore: "Async replication means lag and stale reads, which breaks read-your-writes. Fixes: read from the primary right after a write, or use causal/session consistency. Synchronous replicas remove lag but add write latency.",
+    explain: "Keeps read-only copies of the primary database. Writes still go to the primary, but the many read queries are served by the replicas, offloading the heavy traffic.",
+    analogy: "A library keeps photocopies of a popular reference book at several desks so many people can read at once, while the master copy stays untouched in one place.",
+    example: "A news site sends every article view to replicas while edits go to the primary. AWS RDS lets you add MySQL/Postgres read replicas with a click.",
+  },
+  {
+    cat: "scaling", icon: "🔗", name: "Consistent Hashing", data: true,
+    when: "Nodes frequently join/leave",
+    whenMore: "When nodes join/leave frequently (caches, Dynamo-style stores) and a plain hash-mod-N would remap nearly all keys on every change. Adding a node moves only about 1/N of keys.",
+    trade: "More complex routing",
+    tradeMore: "A naive ring gives uneven load and hotspots, so you need virtual nodes for balance. Clients (or a router) must track ring topology — more routing machinery than mod-N hashing.",
+    explain: "A clever way to map data keys to servers so that when you add or remove a server, only a small fraction of keys need to move — instead of reshuffling everything.",
+    analogy: "Guests seated around a big round table. If one chair is removed, only that chair's guests shift to the neighbor — the whole room doesn't have to get up.",
+    example: "DynamoDB, Cassandra, and memcached clusters use it to distribute keys; CDNs use it to consistently pick which cache node holds an object.",
+  },
+  {
+    cat: "scaling", icon: "🧩", name: "Data Partitioning", data: true,
+    when: "Massive datasets",
+    whenMore: "When a dataset is too big to store or scan as one unit — partition by range, hash, or list so queries prune to just the relevant slice (partition pruning). Sharding is partitioning across machines.",
+    trade: "Rebalancing challenges",
+    tradeMore: "Skewed keys create hot partitions doing most of the work; fixing skew or adding partitions means moving large volumes of data. Choosing range vs hash trades range-scan locality against even distribution.",
+    explain: "Divides a large dataset into partitions based on a key — by range, hash, or list — so storage and processing spread out. (Sharding is partitioning specifically across separate machines.)",
+    analogy: "Organizing a giant warehouse into clearly labeled aisles by category, so a worker only has to search one aisle instead of the whole building.",
+    example: "Kafka splits a topic into partitions for parallel consumption; BigQuery and Hive tables are partitioned by date so a query scans only the relevant days.",
+  },
+  {
+    cat: "caching", icon: "🗃️", name: "Cache-Aside", data: true,
+    when: "Read-heavy workloads",
+    whenMore: "Read-heavy data that tolerates slight staleness; the app lazily loads on a miss and caches the result. The default caching pattern (Redis/Memcached).",
+    trade: "Stale cache risk",
+    tradeMore: "Cache and DB diverge after writes — needs TTL or explicit invalidation. First read is a miss (three hops). Watch for thundering-herd/stampede when a hot key expires, and cache penetration from repeated misses.",
+    explain: "The app checks the cache first. On a miss it reads from the database, then stores the result in the cache so the next request is fast. Also called lazy loading.",
+    analogy: "Keeping your most-used spices on the counter. If one isn't there, you fetch it from the pantry and leave it out for next time.",
+    example: "Redis or Memcached sitting in front of a database for product pages and user profiles — the single most common caching pattern on the web.",
+  },
+  {
+    cat: "caching", icon: "✍️", name: "Write-Through Cache", data: true,
+    when: "Data must stay fresh",
+    whenMore: "When reads must never be stale — the write updates cache and DB synchronously, so the cache is always authoritative. Usually paired with cache-aside reads.",
+    trade: "Slower writes",
+    tradeMore: "Extra write latency from two synchronous writes, and you cache cold data that may never be read. On its own it doesn't prevent a cold-start miss, so it's combined with read-through/cache-aside.",
+    explain: "Every write updates the cache and the database at the same time, so the cache is never out of date. Reads are always correct, but each write pays the cost of two updates.",
+    analogy: "Writing an appointment into both your phone calendar and your paper planner at once — they're always perfectly in sync.",
+    example: "Used where reads must always reflect the latest write, such as caching layers in front of inventory counts or account balances.",
+  },
+  {
+    cat: "caching", icon: "⚡", name: "Write-Behind Cache", data: true,
+    when: "Ultra-fast writes needed",
+    whenMore: "Write-heavy, latency-critical paths that tolerate some loss — counters, metrics, telemetry — ack from cache immediately and flush to the store asynchronously in batches.",
+    trade: "Potential data loss",
+    tradeMore: "A crash before flush loses the un-persisted writes, and direct DB readers see stale data until the next flush. Needs durability on the cache (WAL/replication) plus careful batching and ordering. Riskiest cache strategy.",
+    explain: "Writes hit the cache instantly and are flushed to the database later in the background. Blazing fast, but if the cache dies before flushing, those writes are lost.",
+    analogy: "Jotting notes on sticky pads all day and filing them into the cabinet at night — fast in the moment, but a sticky note that blows away is gone for good.",
+    example: "High-throughput counters and metrics, or analytics/logging pipelines that buffer huge volumes of writes and persist them in batches.",
+  },
+  {
+    cat: "caching", icon: "🌍", name: "CDN",
+    when: "Global low-latency delivery",
+    whenMore: "Static or cacheable assets served to a geographically distributed audience — push copies to edge PoPs to cut round-trip latency and offload the origin.",
+    trade: "Stale content until refresh",
+    tradeMore: "Edge copies stay stale until TTL expiry or an explicit purge, so deploys need cache-busting (content-hashed URLs). Cache-hit ratio and the invalidation strategy are the key levers to tune.",
+    explain: "A Content Delivery Network caches your static files (images, video, CSS, JS) on servers around the world, so each user downloads from a location physically near them.",
+    analogy: "A global store chain stocking the same products in local branches, so you don't ship every order from one overseas warehouse.",
+    example: "Cloudflare, Akamai, and CloudFront serve YouTube thumbnails, website assets, and software downloads from the edge closest to each visitor.",
+  },
+  {
+    cat: "caching", icon: "📊", name: "Materialized Views", data: true,
+    when: "Expensive queries repeated often",
+    whenMore: "When an expensive aggregation or join is read far more often than the base data changes — precompute once, serve many. A staple of OLAP and reporting.",
+    trade: "Refresh lag",
+    tradeMore: "Results are stale between refreshes, and a full refresh is costly — so prefer incremental refresh where supported. You trade extra storage and refresh cost for low read latency.",
+    explain: "Precomputes the result of a heavy query and stores it like a table, so reads are instant. It refreshes on a schedule instead of recomputing on every request.",
+    analogy: "A monthly sales summary printed and pinned to the wall — you glance at it instead of re-adding every receipt each time someone asks for the total.",
+    example: "Reporting dashboards backed by materialized views in PostgreSQL, Snowflake, or BigQuery for expensive aggregations.",
+  },
+  {
+    cat: "data", icon: "🕰️", name: "Event Sourcing", data: true,
+    when: "Need complete audit/history",
+    whenMore: "When you need an immutable audit trail, temporal queries ('state as of time T'), or to derive multiple read models from one log — ledgers, finance, order lifecycles.",
+    trade: "Complex event replay",
+    tradeMore: "Rebuilding state means replaying events (needs snapshots to stay fast); event schema versioning is hard; and it's poor for ad-hoc queries, so it's usually paired with CQRS. Steep learning curve versus CRUD.",
+    explain: "Instead of storing only the current state, you store every change as an immutable event. The current state is rebuilt by replaying those events from the beginning.",
+    analogy: "A bank statement: you don't just see today's balance, you see every deposit and withdrawal that added up to it — and you can reconstruct any past day.",
+    example: "Banking ledgers and order systems; commonly implemented with Kafka as the durable event log or frameworks like Axon.",
+  },
+  {
+    cat: "data", icon: "🔀", name: "CQRS", data: true,
+    when: "Read and write workloads differ",
+    whenMore: "When read and write models diverge sharply in shape or scale — complex write invariants but high-volume, denormalized reads. Lets each side use its own model and datastore; often pairs with event sourcing.",
+    trade: "More components",
+    tradeMore: "Two models to keep in sync, typically eventually consistent via events — real code and operational overhead. Clearly overkill for simple CRUD; only worth it where the read/write asymmetry is large.",
+    explain: "Command Query Responsibility Segregation separates the write model (commands that change data) from the read model (queries), so each can be optimized and scaled on its own.",
+    analogy: "A restaurant's kitchen (which handles incoming orders) is built completely differently from the menu board out front (built for easy reading) — different jobs, different designs.",
+    example: "E-commerce where placing an order and browsing the catalog have wildly different loads; often paired with Event Sourcing.",
+  },
+  {
+    cat: "data", icon: "🔒", name: "Distributed Transactions", data: true,
+    when: "Strong consistency required",
+    whenMore: "Only when multiple resources must commit atomically and eventual consistency is unacceptable — e.g. debit and credit across two databases in one unit.",
+    trade: "Performance overhead",
+    tradeMore: "2PC is blocking and synchronous: the coordinator is a single point of failure, and locks held across the network kill throughput and availability (a CAP trade-off). Most systems prefer sagas or the outbox pattern instead.",
+    explain: "Coordinates a single transaction across multiple databases or services so they all commit together or all roll back together — typically via two-phase commit (2PC).",
+    analogy: "A real-estate closing: the keys, the money, and the deed must all change hands at the same moment, or the entire deal is called off.",
+    example: "Two-phase commit across services, or a bank transfer between two ledgers that must be all-or-nothing.",
+  },
+  {
+    cat: "data", icon: "🧵", name: "Saga Pattern", data: true,
+    when: "Distributed business workflows",
+    whenMore: "Long-running, multi-service business transactions where you trade atomicity for availability — coordinated by orchestration (a central conductor) or choreography (services reacting to events).",
+    trade: "Eventual consistency",
+    tradeMore: "Intermediate states are visible, and every step needs an idempotent compensating action — which can itself fail. There's no isolation, so you must guard against anomalies (e.g. with semantic locks).",
+    explain: "Breaks a long transaction into a chain of local steps, each with a compensating action to undo it if a later step fails. Trades strict consistency for availability across services.",
+    analogy: "Booking a trip step by step — flight, then hotel, then car. If the car booking fails, you cancel the hotel and flight (the compensations) rather than freezing everything until the very end.",
+    example: "Order → payment → inventory → shipping across microservices, orchestrated by a tool like Temporal or choreographed through events.",
+  },
+  {
+    cat: "events", icon: "📨", name: "Message Queue",
+    when: "Need asynchronous processing",
+    whenMore: "Decouple producers from consumers for async, bursty, or slow work — buffer spikes and smooth load (SQS, RabbitMQ). Each message is processed by one consumer in a group.",
+    trade: "Increased latency",
+    tradeMore: "Adds end-to-end latency, so it's wrong when you need an immediate answer. You own ordering, retries, and a dead-letter queue for poison messages; delivery is usually at-least-once, so consumers must dedupe.",
+    explain: "A buffer that holds messages so producers and consumers don't have to run at the same speed. Work is dropped on the queue and processed later, smoothing out spikes.",
+    analogy: "A deli ticket system — you take a number and walk away; staff serve tickets in order whenever they're free, so a rush doesn't turn into chaos.",
+    example: "RabbitMQ or AWS SQS handling background jobs like sending emails, resizing images, or processing uploads.",
+  },
+  {
+    cat: "events", icon: "📡", name: "Publish-Subscribe",
+    when: "Multiple consumers need events",
+    whenMore: "One event, many independent consumers; add subscribers without touching the producer (Kafka topics, SNS, Pub/Sub). Unlike a queue, every subscriber gets its own copy.",
+    trade: "Harder debugging",
+    tradeMore: "Decoupling makes end-to-end tracing hard, and you handle slow/failed/duplicate consumers plus fan-out amplification. Needs schema governance so one producer change doesn't break many consumers.",
+    explain: "Publishers send messages to a topic, and every subscriber gets its own copy. Senders and receivers are fully decoupled — neither knows about the other.",
+    analogy: "A newspaper subscription: the publisher prints once, and every subscriber receives their own copy at home without the publisher knowing each reader.",
+    example: "Kafka topics, Google Pub/Sub, or Redis pub/sub — one 'order placed' event is read independently by billing, analytics, and email services.",
+  },
+  {
+    cat: "events", icon: "⚙️", name: "Event-Driven Architecture",
+    when: "Services react to events",
+    whenMore: "When services should react to facts asynchronously and you want to extend behavior by adding listeners, not editing call chains. Choose event notification vs event-carried state vs event sourcing per need.",
+    trade: "Eventual consistency",
+    tradeMore: "No global ordering and a window where services disagree; end-to-end flows are hard to follow. Demands strong observability (distributed tracing, correlation IDs) and idempotent handlers to be operable.",
+    explain: "Services communicate by emitting and reacting to events rather than calling each other directly. This keeps them loosely coupled, so you can add new reactions without touching the source.",
+    analogy: "A fire alarm: when it goes off, the sprinklers, the doors, and the fire department all react on their own — the alarm doesn't have to phone each one individually.",
+    example: "AWS EventBridge — a single 'user signed up' event triggers a welcome email, a CRM update, and account provisioning, each handled independently.",
+  },
+  {
+    cat: "events", icon: "🌊", name: "Stream Processing", data: true,
+    when: "Real-time analytics needed",
+    whenMore: "When insight is only valuable while fresh — fraud detection, live dashboards, alerting — process unbounded data continuously (Flink, Kafka Streams) rather than waiting for a batch run.",
+    trade: "Operational complexity",
+    tradeMore: "Must handle event-time vs processing-time, watermarks and windowing, out-of-order/late data, and exactly-once via stateful checkpointing. Always-on and far heavier to operate than a batch job.",
+    explain: "Processes data continuously as it arrives — data 'in motion' — rather than waiting to crunch it in nightly batches. Enables insights within seconds of an event.",
+    analogy: "Sorting mail as it drops through the slot all day long, instead of dumping a week's pile on the table every Sunday.",
+    example: "Apache Flink, Kafka Streams, or Spark Streaming powering fraud detection, live dashboards, and real-time recommendations.",
+  },
+  {
+    cat: "events", icon: "🪝", name: "Webhook Pattern",
+    when: "External notifications required",
+    whenMore: "Push real-time notifications to external systems instead of having them poll you — payment confirmations, CI triggers, third-party integrations (Stripe, GitHub).",
+    trade: "Delivery reliability issues",
+    tradeMore: "You depend on the receiver's availability, so you need retries with backoff, HMAC signature verification for authenticity, and receiver-side idempotency to absorb at-least-once duplicate deliveries.",
+    explain: "Instead of you repeatedly asking a service 'any updates yet?', the service calls a URL you provide the moment an event happens. It's push, not poll.",
+    analogy: "Instead of checking your mailbox every hour, the postman rings your doorbell the instant a package arrives.",
+    example: "Stripe calls your endpoint when a payment succeeds; GitHub fires a webhook on every push to kick off your CI pipeline.",
+  },
+  {
+    cat: "resilience", icon: "🔌", name: "Circuit Breaker",
+    when: "Dependency failures cascade",
+    whenMore: "Wrap calls to a dependency that can fail or hang, to stop failures cascading and threads piling up. It cycles through closed → open → half-open states.",
+    trade: "Recovery tuning required",
+    tradeMore: "Tuning thresholds (error rate, timeout, half-open probes) is delicate — too sensitive rejects healthy traffic, too lax protects nothing. Pair with timeouts, fallbacks, and bulkheads to be effective.",
+    explain: "Detects when a downstream service is failing and 'trips' to stop sending it requests for a while. This prevents one sick service from dragging down everything that calls it, and gives it time to recover.",
+    analogy: "The electrical breaker in your home that flips off during a surge — it protects the whole house instead of letting the wiring overheat and catch fire.",
+    example: "Netflix's Hystrix and the Resilience4j library wrap calls to flaky dependencies and short-circuit them when failures pile up.",
+  },
+  {
+    cat: "resilience", icon: "🔁", name: "Retry Pattern",
+    when: "Temporary failures common",
+    whenMore: "For transient, retryable failures — timeouts, 503s, network blips — on idempotent operations where trying again shortly is likely to succeed.",
+    trade: "Retry storms possible",
+    tradeMore: "Naive retries cause retry storms / thundering herd that worsen an outage — require exponential backoff with jitter, capped attempts, and a retry budget. Retrying non-idempotent calls duplicates effects.",
+    explain: "Automatically re-attempts a failed operation, ideally with exponential backoff and random jitter, because many failures (a blip, a brief network hiccup) are temporary and succeed on a second try.",
+    analogy: "A dropped phone call — you redial, maybe wait a couple of seconds first, instead of assuming the person vanished forever.",
+    example: "Cloud SDKs (AWS, gRPC) automatically retry transient network and 5xx errors with growing delays between attempts.",
+  },
+  {
+    cat: "resilience", icon: "🚢", name: "Bulkhead",
+    when: "Isolate failures between services",
+    whenMore: "Isolate resources — separate thread/connection pools per dependency or per tenant — so one overloaded path can't starve the rest of the system.",
+    trade: "Resource fragmentation",
+    tradeMore: "Partitioning lowers overall utilization (idle capacity in one pool can't be borrowed by another) and adds per-pool sizing and config overhead. Under-size a pool and you throttle a healthy path.",
+    explain: "Isolates resources — like separate thread or connection pools per feature — so that overload or failure in one part can't consume all resources and sink the entire system.",
+    analogy: "A ship's hull divided into watertight compartments: if one floods, the others stay sealed and the ship stays afloat.",
+    example: "Assigning each downstream dependency its own thread pool in Resilience4j, or isolating one noisy tenant in a multi-tenant SaaS so it can't starve the others.",
+  },
+  {
+    cat: "resilience", icon: "🚦", name: "Rate Limiting",
+    when: "Protect services from overload",
+    whenMore: "Protect against spikes, abuse, and noisy neighbors, or enforce quotas and paid tiers — via token bucket, leaky bucket, or sliding window, keyed per user / IP / API key.",
+    trade: "Possible user throttling",
+    tradeMore: "Can throttle legitimate bursts, so return 429 with a Retry-After header. Distributed limiting needs a shared counter (Redis), which adds latency and a coordination point; token bucket allows bursts, leaky bucket smooths them.",
+    explain: "Caps how many requests a client can make in a time window, protecting the system from overload, abuse, and runaway costs. Excess requests are rejected or delayed.",
+    analogy: "A nightclub with a one-in-one-out door policy once it hits capacity — keeps things safe inside rather than letting a dangerous crush build up.",
+    example: "API limits like GitHub's 5,000 requests/hour, enforced with token-bucket or leaky-bucket algorithms at the API gateway.",
+  },
+  {
+    cat: "resilience", icon: "🛟", name: "Failover",
+    when: "High availability required",
+    whenMore: "When downtime is costly and you must survive instance, AZ, or region loss by promoting a standby — active-passive (cheaper, idle standby) or active-active (no idle, harder).",
+    trade: "Duplicate infrastructure cost",
+    tradeMore: "Standby capacity costs money and failover must be drilled. Key risks: split-brain (needs fencing/quorum), data loss on async replication (your RPO), and promotion time (your RTO).",
+    explain: "Keeps a standby copy ready and automatically switches to it the moment the primary fails, so the system keeps running with minimal interruption.",
+    analogy: "A backup generator that kicks in within seconds of the power grid going out, so the lights barely flicker.",
+    example: "A database primary with a hot standby that gets promoted automatically, or AWS multi-AZ deployments that survive a whole data-center outage.",
+  },
+  {
+    cat: "infra", icon: "👑", name: "Leader Election",
+    when: "Single coordinator needed",
+    whenMore: "When exactly one node must own a role at a time — scheduler, primary writer, partition owner — and the cluster must auto-elect a replacement on failure (Raft/Paxos via ZooKeeper, etcd).",
+    trade: "Election overhead",
+    tradeMore: "Consensus adds latency and chatter, and there's a brief leaderless window during an election. Partitions risk split-brain (two leaders) without a quorum and fencing tokens to stop the old leader acting.",
+    explain: "A group of nodes agree on a single 'leader' to coordinate work and make decisions. If the leader dies, the rest detect it and elect a new one automatically.",
+    analogy: "A team picking a captain to make the final calls; if the captain has to leave the field, the team quickly votes in a new one so play continues.",
+    example: "ZooKeeper, etcd, and the Raft algorithm; Kafka uses it to pick a controller, and Kubernetes uses it for its control-plane components.",
+  },
+  {
+    cat: "infra", icon: "🧭", name: "Service Discovery",
+    when: "Dynamic service locations",
+    whenMore: "Dynamic environments (containers, autoscaling) where instance IPs change constantly — resolve live endpoints from a registry, client-side or server-side.",
+    trade: "Additional infrastructure",
+    tradeMore: "The registry is critical infra that must be highly available, and it needs health checks to evict dead nodes — stale entries cause failed calls. TTL and propagation delay are the freshness-vs-load trade-offs.",
+    explain: "Lets services find each other's network addresses on the fly instead of hardcoding IPs, which is essential when instances are constantly created, destroyed, and moved.",
+    analogy: "A hotel front desk that always knows which room any guest is in, even as people check in and out all day — you ask the desk, not memorize room numbers.",
+    example: "Consul, etcd, and Netflix Eureka; in Kubernetes, built-in DNS and Services resolve a stable name to whatever pods are currently alive.",
+  },
+  {
+    cat: "infra", icon: "🚪", name: "API Gateway",
+    when: "Many backend services",
+    whenMore: "A single entry point for many services — centralize auth, TLS termination, routing, rate limiting, and response aggregation (often a BFF for mobile/web).",
+    trade: "Central bottleneck risk",
+    tradeMore: "Every request flows through it, making it a single point of failure and a potential choke — it must be HA and scaled. Stay disciplined or it becomes a fat layer of business logic.",
+    explain: "A single entry point sitting in front of many backend services. It handles routing, authentication, rate limiting, and can combine several service calls into one response.",
+    analogy: "A building's reception desk: one place that checks your ID, gives directions, and routes you to the right office instead of you wandering the halls.",
+    example: "Kong, AWS API Gateway, or NGINX — a mobile app hits one gateway, which fans the request out to dozens of microservices behind it.",
+  },
+  {
+    cat: "infra", icon: "🏍️", name: "Sidecar Pattern",
+    when: "Shared service functionality",
+    whenMore: "Add cross-cutting concerns — proxy, mTLS, logging, secrets — to polyglot services without changing app code, by running one helper container per instance.",
+    trade: "Extra resource usage",
+    tradeMore: "Per-instance overhead multiplied across the whole fleet, an extra network hop's latency, and another component to version and operate. It's also the building block of a service mesh.",
+    explain: "Deploys a helper process or container alongside your main app to handle cross-cutting concerns — logging, networking, security — without changing the app's own code.",
+    analogy: "A motorcycle sidecar: it carries extra gear and a passenger without redesigning the motorcycle itself.",
+    example: "An Envoy proxy running as a sidecar in Istio, or a logging/secrets agent that runs next to each application container.",
+  },
+  {
+    cat: "infra", icon: "🕸️", name: "Service Mesh",
+    when: "Large microservice deployments",
+    whenMore: "Many microservices where per-service mTLS, retries, traffic shifting (canary/blue-green), and telemetry are unmanageable — push it down to the platform (Istio, Linkerd).",
+    trade: "Significant operational complexity",
+    tradeMore: "A control plane plus a proxy on every pod is heavy to install, upgrade, and debug, and adds latency and resource cost. Below a few dozen services it's firmly overkill — a gateway or libraries suffice.",
+    explain: "A dedicated infrastructure layer (usually sidecars plus a control plane) that manages all service-to-service communication: traffic routing, retries, encryption (mTLS), and observability — so individual services don't have to.",
+    analogy: "A city's traffic system — lights, signs, and cameras governing how every car moves — so drivers don't have to negotiate each intersection by hand.",
+    example: "Istio and Linkerd handling mutual-TLS encryption, automatic retries, and detailed telemetry across hundreds of microservices.",
+  },
+
+  // ----- Data Platform & Pipelines (data-engineering essentials) -----
+  {
+    cat: "dataplatform", icon: "📝", name: "Write-Ahead Log (WAL)", data: true,
+    when: "Durability and crash recovery",
+    whenMore: "When a write must survive a crash: append the change to a durable, append-only log and fsync it before mutating the actual tables. The single source of truth for recovery, and the basis of replication and CDC.",
+    trade: "fsync latency; log must be compacted",
+    tradeMore: "Durability vs latency: fsync-per-write is safe but slow, so engines batch/group-commit. The log needs checkpointing/compaction or it grows forever, and recovery time scales with the un-checkpointed tail.",
+    explain: "Every change is written to an append-only log on disk (and flushed) before it is applied to the main data structures. After a crash, the system replays the log to reach a consistent state.",
+    analogy: "A ship's logbook: you record each action the instant it happens, so if the ship is later found adrift, anyone can replay the log to reconstruct exactly what occurred.",
+    example: "Postgres WAL, MySQL binlog, and Kafka's commit log. The same WAL/binlog is what change-data-capture tools tail to stream changes downstream.",
+  },
+  {
+    cat: "dataplatform", icon: "🔄", name: "Change Data Capture (CDC)", data: true,
+    when: "Propagate DB changes in near-real-time",
+    whenMore: "When inserts/updates/deletes in an OLTP database must flow to a warehouse, lake, cache, or search index without brittle dual-writes — tail the DB's WAL/binlog (log-based CDC) instead of polling.",
+    trade: "Schema drift, ordering, and bootstrap",
+    tradeMore: "You couple to the DB's internal log format and must handle schema evolution, ordered/exactly-once delivery into the sink, the initial snapshot-plus-stream bootstrap, and hard deletes (query-based CDC misses them).",
+    explain: "Captures every committed change in a source database and emits it as an event stream, so downstream systems stay in sync continuously instead of via expensive periodic full reloads.",
+    analogy: "A news ticker for your database: rather than re-reading the whole paper each morning, you get each headline the moment it is published.",
+    example: "Debezium reading the Postgres WAL / MySQL binlog into Kafka, feeding a Snowflake or BigQuery warehouse, a search index, or a cache.",
+  },
+  {
+    cat: "dataplatform", icon: "🧱", name: "Batch Processing", data: true,
+    when: "Large bounded datasets, latency-tolerant",
+    whenMore: "When you process big, finite datasets on a schedule and throughput/cost matter more than freshness — nightly ETL, backfills, and training-data prep. The complement to stream processing.",
+    trade: "High latency; stale between runs",
+    tradeMore: "Output is only as fresh as the last run, and a failed multi-hour job wastes the whole pass — so jobs must be idempotent and re-runnable, with partitioning and checkpoints. Expect bursty resource spikes at run time.",
+    explain: "Processes a large, fixed chunk of data in a single scheduled pass, optimizing for throughput and cost efficiency rather than for sub-second freshness.",
+    analogy: "Doing all your laundry in a few big weekly loads — far more efficient per item than washing each sock the moment it gets dirty, but you wait for the cycle.",
+    example: "Spark and MapReduce jobs, dbt models, and Airflow-scheduled nightly ETL that loads the data warehouse.",
+  },
+  {
+    cat: "dataplatform", icon: "🏛️", name: "Lambda & Kappa Architecture", data: true,
+    when: "Reconcile real-time and historical views",
+    whenMore: "Lambda runs a batch layer (accurate, complete) beside a speed layer (fast, approximate) and merges them. Kappa drops batch entirely and recomputes history by replaying the stream.",
+    trade: "Lambda dual code paths; Kappa replay cost",
+    tradeMore: "Lambda means two codebases implementing the same logic — duplication and drift between batch and stream. Kappa collapses to one path but needs a long-retained, replayable log and pays for full reprocessing on changes.",
+    explain: "Two blueprints for combining batch and streaming. Lambda keeps both a batch and a speed layer; Kappa uses one streaming layer and replays the log whenever it must recompute the past.",
+    analogy: "Lambda keeps both a fast sketch and a slow, careful painting of the same scene and blends them; Kappa just redraws the sketch from your notes whenever you need more detail.",
+    example: "Lambda was popularized with Storm + Hadoop; Kappa was promoted by Kafka — a single Flink or Kafka Streams pipeline you replay from a retained topic.",
+  },
+  {
+    cat: "dataplatform", icon: "🏞️", name: "Data Lakehouse", data: true,
+    when: "ACID + analytics on cheap object storage",
+    whenMore: "When you want warehouse-grade reliability — ACID transactions, schema enforcement, time travel, upserts — directly on low-cost object storage, without locking data inside a proprietary warehouse.",
+    trade: "Small-file/compaction & operational burden",
+    tradeMore: "You own table metadata, compaction of small files, snapshot expiry, and concurrency control (often via a catalog). The tooling is younger and less turnkey than a managed warehouse.",
+    explain: "An open table format — a transaction log plus metadata layered over Parquet files on object storage — that gives a data lake the ACID guarantees, schema, and time travel of a warehouse.",
+    analogy: "Adding a proper catalog and checkout system to a giant warehouse of books: the cheap storage stays, but now you get order, versioning, and consistency.",
+    example: "Apache Iceberg, Delta Lake, and Apache Hudi on S3/GCS, queried by Spark, Trino, Snowflake, or BigQuery.",
+  },
+  {
+    cat: "dataplatform", icon: "🧮", name: "Columnar Storage", data: true,
+    when: "Analytical (OLAP) scans over few columns",
+    whenMore: "When queries aggregate a few columns across many rows (sum, avg, group-by) — store data column-by-column so you read only the needed columns and compress runs of similar values aggressively.",
+    trade: "Poor for row-level OLTP writes/lookups",
+    tradeMore: "Bad for transactional point-reads and updates of whole rows; single-row inserts/updates are expensive (often append + compact). It's for read-mostly analytics, not OLTP — hence OLAP and OLTP stores stay separate.",
+    explain: "Stores each column's values contiguously instead of each row's, so analytical queries scan only the columns they touch and gain huge compression from similar adjacent values.",
+    analogy: "A spreadsheet stored column-by-column: to average everyone's salary you read just the salary column, never each full employee record.",
+    example: "Parquet and ORC files, and columnar engines like BigQuery, Snowflake, Redshift, and ClickHouse.",
+  },
+  {
+    cat: "dataplatform", icon: "📤", name: "Transactional Outbox", data: true,
+    when: "Publish events atomically with a DB write",
+    whenMore: "When a service must update its database AND publish an event without the dual-write problem — write the event into an 'outbox' table in the same local transaction, then relay it to the broker.",
+    trade: "Needs a relay; at-least-once delivery",
+    tradeMore: "A poller or CDC relays the outbox to the broker, adding a component and a little latency. Delivery is at-least-once, so consumers must be idempotent, and the outbox table needs periodic cleanup.",
+    explain: "Instead of writing to the database and the message broker separately (which can partially fail), you write the event to an outbox table inside the same DB transaction; a relay publishes it afterwards.",
+    analogy: "Dropping your outgoing letter into your own out-tray as you finish the paperwork, then letting the mail carrier collect it later — the letter can't be lost just because the carrier was delayed.",
+    example: "An outbox table polled by a relay or tailed by Debezium CDC into Kafka — the standard fix for the dual-write problem in saga and event-driven systems.",
+  },
+  {
+    cat: "dataplatform", icon: "🎯", name: "Idempotency & Exactly-Once", data: true,
+    when: "Retries/replays must not double-apply",
+    whenMore: "When at-least-once delivery or retries can duplicate effects (double charge, double insert) — dedupe with idempotency keys, unique constraints, or tracking processed offsets so reprocessing is safe.",
+    trade: "'Exactly-once' is end-to-end and costly",
+    tradeMore: "True exactly-once is really effectively-once: idempotency plus transactional state. It needs dedup storage, careful key design, and broker support (e.g. Kafka transactions), adding latency and bookkeeping.",
+    explain: "Designing operations so that applying them once or many times produces the same result — which is what makes retries and stream replays safe in a distributed system.",
+    analogy: "An elevator call button: pressing it five times still summons exactly one elevator — the extra presses change nothing.",
+    example: "Stripe idempotency keys on payments, Kafka's transactional (exactly-once) semantics, and dedup via unique constraints or a 'seen-IDs' table.",
+  },
+  {
+    cat: "dataplatform", icon: "📜", name: "Schema Evolution & Contracts", data: true,
+    when: "Pipelines outlive their schemas",
+    whenMore: "When producers and consumers deploy independently over years — enforce backward/forward-compatible changes (add optional fields, never break) through a schema registry and explicit data contracts.",
+    trade: "Compatibility rules + governance overhead",
+    tradeMore: "You must enforce compatibility in CI, version schemas, and coordinate breaking changes/migrations across teams. Too strict and teams are blocked; too loose and a silent change breaks downstream jobs.",
+    explain: "Rules and tooling that let data formats change safely while old and new producers and consumers coexist, so a schema change doesn't silently break a downstream job.",
+    analogy: "Designing a form so that adding a new optional field doesn't invalidate every form already filled out — old and new versions both keep working.",
+    example: "Avro or Protobuf with the Confluent Schema Registry enforcing compatibility, plus 'data contracts' agreed between producing and consuming teams.",
+  },
+  {
+    cat: "dataplatform", icon: "🛑", name: "Backpressure", data: true,
+    when: "Fast producer overwhelms slow consumer",
+    whenMore: "When upstream can produce faster than downstream can consume — propagate a 'slow down' signal so buffers don't grow without bound and crash the system (bounded queues, pull-based / demand-driven flow control).",
+    trade: "Throttles producers; needs overflow policy",
+    tradeMore: "Backpressure slows or blocks the producer, or forces you to drop/sample/spill data. Sizing buffers and choosing the overflow policy (block vs drop vs spill-to-disk) is a non-trivial tuning problem.",
+    explain: "A flow-control mechanism where a slow consumer signals upstream to ease off, preventing unbounded queue growth and the out-of-memory failures that would otherwise follow.",
+    analogy: "A checkout line where the cashier tells the door staff to stop letting people in until the queue clears — far better than the shop overflowing.",
+    example: "Reactive Streams (Project Reactor, RxJava), Flink and Kafka-consumer lag-based throttling, and TCP's own flow control.",
+  },
+];
+
+const DATA_COUNT = PATTERNS.filter(p => p.data).length;
+
+// ---------------------------------------------------------------------------
+// RENDER
+// ---------------------------------------------------------------------------
+const sectionsEl = document.getElementById("sections");
+const filtersEl = document.getElementById("filters");
+const searchEl = document.getElementById("search");
+const countEl = document.getElementById("count");
+const emptyEl = document.getElementById("empty");
+const dataCallout = document.getElementById("dataCallout");
+
+let activeFilter = "all"; // "all" | "data" | category key
+let query = "";
+
+// Build filter pills
+function buildFilters() {
+  const all = `<button class="pill active" data-filter="all">All <span style="opacity:.6">${PATTERNS.length}</span></button>`;
+  const data = `<button class="pill data-pill" data-filter="data">⭐ Data Apps <span style="opacity:.7">${DATA_COUNT}</span></button>`;
+  const cats = Object.entries(CATEGORIES).map(([key, c]) => {
+    const n = PATTERNS.filter(p => p.cat === key).length;
+    return `<button class="pill" data-filter="${key}"><span class="dot" style="background:${c.color}"></span>${c.label} <span style="opacity:.6">${n}</span></button>`;
+  }).join("");
+  filtersEl.innerHTML = all + data + cats;
+  filtersEl.querySelectorAll(".pill").forEach(btn => {
+    btn.addEventListener("click", () => setFilter(btn.dataset.filter));
+  });
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  filtersEl.querySelectorAll(".pill").forEach(b =>
+    b.classList.toggle("active", b.dataset.filter === f)
+  );
+  render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function highlight(text, q) {
+  if (!q) return escapeHtml(text);
+  const safe = escapeHtml(text);
+  const re = new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+  return safe.replace(re, "<mark>$1</mark>");
+}
+
+function matches(p, q) {
+  if (!q) return true;
+  const hay = (p.name + " " + p.when + " " + p.trade + " " + p.explain + " " + p.analogy + " " + p.example + " " + CATEGORIES[p.cat].label).toLowerCase();
+  return hay.includes(q);
+}
+
+function passesFilter(p) {
+  if (activeFilter === "all") return true;
+  if (activeFilter === "data") return !!p.data;
+  return p.cat === activeFilter;
+}
+
+function cardHtml(p, i) {
+  const c = CATEGORIES[p.cat];
+  return `
+    <div class="card ${p.data ? "data" : ""}" style="--cat-color:${c.color}" data-index="${i}">
+      <div class="card-cat-row">
+        <span class="card-cat">${c.label}</span>
+        ${p.data ? '<span class="data-badge">⭐ Data</span>' : ""}
+      </div>
+      <div class="card-top">
+        <span class="card-icon">${p.icon}</span>
+        <span class="card-title">${highlight(p.name, query)}</span>
+        <span class="card-num">${String(i + 1).padStart(2, "0")}</span>
+      </div>
+      <div class="card-line">
+        <div class="tag tag-when"><span class="tag-label">Pick when</span>${highlight(p.when, query)}</div>
+        <div class="tag tag-trade"><span class="tag-label">Trade-off</span>${highlight(p.trade, query)}</div>
+      </div>
+      <div class="tap-hint">Tap for the full explanation →</div>
+    </div>`;
+}
+
+function render() {
+  query = searchEl.value.trim().toLowerCase();
+  dataCallout.style.display = (activeFilter === "data") ? "none" : "flex";
+
+  const visible = PATTERNS
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => passesFilter(p) && matches(p, query));
+
+  if (visible.length === 0) {
+    sectionsEl.innerHTML = "";
+    emptyEl.style.display = "block";
+    countEl.textContent = "";
+    return;
+  }
+  emptyEl.style.display = "none";
+
+  const label = activeFilter === "all" ? "patterns"
+    : activeFilter === "data" ? "data-focused patterns"
+    : CATEGORIES[activeFilter].label + " patterns";
+  countEl.textContent = `Showing ${visible.length} of ${PATTERNS.length} ${query ? "matching " : ""}${label}`;
+
+  // Group visible patterns by category, preserving category order
+  let html = "";
+  Object.entries(CATEGORIES).forEach(([key, c]) => {
+    const items = visible.filter(({ p }) => p.cat === key);
+    if (items.length === 0) return;
+    html += `
+      <section class="cat-section" id="sec-${key}">
+        <div class="cat-heading">
+          <span class="dot" style="background:${c.color}"></span>
+          <h2>${c.label}</h2>
+          <span class="ch-count">${items.length}</span>
+        </div>
+        <div class="grid">${items.map(({ p, i }) => cardHtml(p, i)).join("")}</div>
+      </section>`;
+  });
+  sectionsEl.innerHTML = html;
+
+  sectionsEl.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => openModal(parseInt(card.dataset.index, 10)));
+  });
+}
+
+// ---------------------------------------------------------------------------
+// NAVIGATION DRAWER (table of contents)
+// ---------------------------------------------------------------------------
+const drawer = document.getElementById("drawer");
+const drawerOverlay = document.getElementById("drawerOverlay");
+const drawerBody = document.getElementById("drawerBody");
+
+function buildDrawer() {
+  let html = `
+    <div class="toc-quick">
+      <button class="pill data-pill" data-jump="all">All ${PATTERNS.length}</button>
+      <button class="pill data-pill" data-jump="data">⭐ Data Apps ${DATA_COUNT}</button>
+    </div>`;
+  Object.entries(CATEGORIES).forEach(([key, c]) => {
+    const items = PATTERNS.map((p, i) => ({ p, i })).filter(({ p }) => p.cat === key);
+    html += `
+      <div class="toc-group">
+        <button class="toc-cat" data-cat="${key}">
+          <span class="dot" style="background:${c.color}"></span>${c.label}
+          <span class="c-count">${items.length}</span>
+        </button>
+        ${items.map(({ p, i }) => `
+          <button class="toc-item ${p.data ? "is-data" : ""}" data-open="${i}">
+            <span class="ti-num">${String(i + 1).padStart(2, "0")}</span>
+            <span class="ti-icon">${p.icon}</span>
+            <span>${p.name}</span>
+            ${p.data ? '<span class="ti-star">⭐</span>' : ""}
+          </button>`).join("")}
+      </div>`;
+  });
+  drawerBody.innerHTML = html;
+
+  // jump pills (All / Data)
+  drawerBody.querySelectorAll("[data-jump]").forEach(btn => {
+    btn.addEventListener("click", () => { setFilter(btn.dataset.jump); closeDrawer(); });
+  });
+  // category headers -> filter to that category
+  drawerBody.querySelectorAll(".toc-cat").forEach(btn => {
+    btn.addEventListener("click", () => { setFilter(btn.dataset.cat); closeDrawer(); });
+  });
+  // pattern items -> open that pattern
+  drawerBody.querySelectorAll(".toc-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = parseInt(btn.dataset.open, 10);
+      // make sure the pattern is visible under the current filter
+      if (!passesFilter(PATTERNS[i])) setFilter("all");
+      searchEl.value = "";
+      render();
+      closeDrawer();
+      openModal(i);
+    });
+  });
+}
+
+function openDrawer() {
+  drawer.classList.add("open");
+  drawerOverlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeDrawer() {
+  drawer.classList.remove("open");
+  drawerOverlay.classList.remove("open");
+  if (currentIndex < 0) document.body.style.overflow = "";
+}
+document.getElementById("navToggle").addEventListener("click", openDrawer);
+document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+drawerOverlay.addEventListener("click", closeDrawer);
+
+// ---------------------------------------------------------------------------
+// MODAL
+// ---------------------------------------------------------------------------
+const overlay = document.getElementById("overlay");
+const modal = document.getElementById("modal");
+let currentIndex = -1;
+
+function openModal(i) {
+  currentIndex = i;
+  const p = PATTERNS[i];
+  const c = CATEGORIES[p.cat];
+  modal.style.setProperty("--cat-color", c.color);
+  document.getElementById("mCat").innerHTML =
+    `${c.label}${p.data ? ' <span class="modal-data-badge">⭐ DATA-INTENSIVE</span>' : ""}`;
+  document.getElementById("mIcon").textContent = p.icon;
+  document.getElementById("mTitle").textContent = `${i + 1}. ${p.name}`;
+  document.getElementById("mBody").innerHTML = `
+    <div class="section">
+      <h3>💡 In plain English</h3>
+      <p>${escapeHtml(p.explain)}</p>
+    </div>
+    <div class="section">
+      <h3>🌟 The analogy</h3>
+      <p>${escapeHtml(p.analogy)}</p>
+    </div>
+    <div class="section">
+      <h3>🏢 Real-world example</h3>
+      <div class="callout example"><p>${escapeHtml(p.example)}</p></div>
+    </div>
+    <div class="section">
+      <h3>✅ Pick it when</h3>
+      <div class="callout when"><p><strong>${escapeHtml(p.when)}.</strong> ${escapeHtml(p.whenMore)}</p></div>
+    </div>
+    <div class="section">
+      <h3>⚠️ The main trade-off</h3>
+      <div class="callout trade"><p><strong>${escapeHtml(p.trade)}.</strong> ${escapeHtml(p.tradeMore)}</p></div>
+    </div>
+    <div class="modal-nav">
+      <button class="nav-btn" id="prevBtn" ${i === 0 ? "disabled" : ""}>← Previous</button>
+      <button class="nav-btn" id="nextBtn" ${i === PATTERNS.length - 1 ? "disabled" : ""}>Next →</button>
+    </div>`;
+  document.getElementById("prevBtn").onclick = () => openModal(i - 1);
+  document.getElementById("nextBtn").onclick = () => openModal(i + 1);
+  overlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+  modal.scrollTop = 0;
+}
+
+function closeModal() {
+  overlay.classList.remove("open");
+  if (!drawer.classList.contains("open")) document.body.style.overflow = "";
+  currentIndex = -1;
+}
+
+document.getElementById("closeBtn").addEventListener("click", closeModal);
+overlay.addEventListener("click", e => { if (e.target === overlay) closeModal(); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (currentIndex >= 0) return closeModal();
+    if (drawer.classList.contains("open")) return closeDrawer();
+  }
+  if (currentIndex < 0) return;
+  if (e.key === "ArrowLeft" && currentIndex > 0) openModal(currentIndex - 1);
+  if (e.key === "ArrowRight" && currentIndex < PATTERNS.length - 1) openModal(currentIndex + 1);
+});
+
+// ---------------------------------------------------------------------------
+// THEME
+// ---------------------------------------------------------------------------
+const themeBtn = document.getElementById("themeBtn");
+function applyTheme(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  themeBtn.textContent = t === "dark" ? "🌙" : "☀️";
+  try { localStorage.setItem("sdp-theme", t); } catch (e) {}
+}
+themeBtn.addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  applyTheme(cur === "dark" ? "light" : "dark");
+});
+(function initTheme() {
+  let saved;
+  try { saved = localStorage.getItem("sdp-theme"); } catch (e) {}
+  if (!saved) saved = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  applyTheme(saved);
+})();
+
+// ---------------------------------------------------------------------------
+// BACK TO TOP
+// ---------------------------------------------------------------------------
+const toTop = document.getElementById("toTop");
+window.addEventListener("scroll", () => {
+  toTop.classList.toggle("show", window.scrollY > 500);
+});
+toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+// ---------------------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------------------
+searchEl.addEventListener("input", render);
+buildFilters();
+buildDrawer();
+render();
+</script>
+</body>
+</html>
